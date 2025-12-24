@@ -3,9 +3,11 @@
  * Maps A2UI component types to React components
  */
 
-import { memo } from 'react'
+import { memo, useState } from 'react'
 import type { A2UIComponent } from '@ainative/ai-kit-a2ui-core/types'
 import { JSONPointer } from '@ainative/ai-kit-a2ui-core/json-pointer'
+import { Input } from './ui/input'
+import { Label } from './ui/label'
 
 export interface ComponentMapperProps {
   /** The A2UI component to render */
@@ -104,6 +106,56 @@ export const ComponentMapper = memo(function ComponentMapper({
   // Divider component
   if (component.type === 'divider') {
     return <hr role="separator" />
+  }
+
+  // TextField component (Input + Label)
+  if (component.type === 'textfield') {
+    const label = String(resolveValue(component.properties?.['label']) || '')
+    const initialValue = String(resolveValue(component.properties?.['value']) || '')
+    const placeholder = String(component.properties?.['placeholder'] || '')
+    const inputType = String(component.properties?.['inputType'] || 'text')
+    const disabled = Boolean(component.properties?.['disabled'])
+    const required = Boolean(component.properties?.['required'])
+    const action = component.properties?.['action']
+
+    const [value, setValue] = useState(initialValue)
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      const newValue = e.target.value
+      setValue(newValue)
+
+      if (action) {
+        onAction(String(action), {
+          componentId: component.id,
+          value: newValue,
+        })
+      }
+    }
+
+    const handleBlur = () => {
+      if (action) {
+        onAction(String(action), {
+          componentId: component.id,
+          value,
+        })
+      }
+    }
+
+    return (
+      <div className="a2ui-textfield">
+        <Label htmlFor={component.id}>{label}</Label>
+        <Input
+          id={component.id}
+          type={inputType}
+          value={value}
+          placeholder={placeholder}
+          disabled={disabled}
+          required={required}
+          onChange={handleChange}
+          onBlur={handleBlur}
+        />
+      </div>
+    )
   }
 
   // Fallback for unsupported components
