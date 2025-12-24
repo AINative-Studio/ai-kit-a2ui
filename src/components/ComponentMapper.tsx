@@ -146,6 +146,64 @@ export const ComponentMapper = memo(function ComponentMapper({
     )
   }
 
+  // List component
+  if (component.type === 'list') {
+    const itemsValue = component.properties?.['items']
+    const items = (
+      Array.isArray(itemsValue)
+        ? itemsValue
+        : resolveValue(itemsValue)
+    ) as Array<{ id: string; label: string; description?: string }> | undefined
+
+    const clickable = component.properties?.['clickable'] !== false
+    const ordered = Boolean(component.properties?.['ordered'])
+    const dividers = Boolean(component.properties?.['dividers'])
+    const action = component.properties?.['action']
+
+    const handleItemClick = (itemId: string) => {
+      if (action && clickable) {
+        onAction(String(action), {
+          componentId: component.id,
+          itemId,
+        })
+      }
+    }
+
+    if (!items || items.length === 0) {
+      return <div className="a2ui-list" />
+    }
+
+    const ListTag = ordered ? 'ol' : 'ul'
+
+    return (
+      <ListTag className="a2ui-list space-y-1">
+        {items.map((item, index) => (
+          <li key={item.id}>
+            {clickable ? (
+              <button
+                className="w-full text-left p-2 hover:bg-accent rounded-md"
+                onClick={() => handleItemClick(item.id)}
+              >
+                <div className="font-medium">{item.label}</div>
+                {item.description && (
+                  <div className="text-sm text-muted-foreground">{item.description}</div>
+                )}
+              </button>
+            ) : (
+              <div className="p-2">
+                <div className="font-medium">{item.label}</div>
+                {item.description && (
+                  <div className="text-sm text-muted-foreground">{item.description}</div>
+                )}
+              </div>
+            )}
+            {dividers && index < items.length - 1 && <hr role="separator" className="my-1" />}
+          </li>
+        ))}
+      </ListTag>
+    )
+  }
+
   // Tabs component
   if (component.type === 'tabs') {
     const defaultValue = String(
