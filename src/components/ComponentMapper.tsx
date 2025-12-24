@@ -9,6 +9,7 @@ import { JSONPointer } from '@ainative/ai-kit-a2ui-core/json-pointer'
 import { Input } from './ui/input'
 import { Label } from './ui/label'
 import { Checkbox } from './ui/checkbox'
+import { Slider } from './ui/slider'
 
 export interface ComponentMapperProps {
   /** The A2UI component to render */
@@ -140,6 +141,49 @@ export const ComponentMapper = memo(function ComponentMapper({
           required={required}
         />
         <Label htmlFor={component.id}>{label}</Label>
+      </div>
+    )
+  }
+
+  // Slider component
+  if (component.type === 'slider') {
+    const label = String(resolveValue(component.properties?.['label']) || '')
+    const initialValue = Number(resolveValue(component.properties?.['value']) || 0)
+    const min = Number(component.properties?.['min'] || 0)
+    const max = Number(component.properties?.['max'] || 100)
+    const step = Number(component.properties?.['step'] || 1)
+    const disabled = Boolean(component.properties?.['disabled'])
+    const showValue = Boolean(component.properties?.['showValue'])
+    const action = component.properties?.['action']
+
+    const [value, setValue] = useState([initialValue])
+
+    const handleValueChange = (newValue: number[]) => {
+      setValue(newValue)
+
+      if (action) {
+        onAction(String(action), {
+          componentId: component.id,
+          value: newValue[0],
+        })
+      }
+    }
+
+    return (
+      <div className="a2ui-slider space-y-2">
+        <div className="flex items-center justify-between">
+          <Label htmlFor={component.id}>{label}</Label>
+          {showValue && <span className="text-sm text-muted-foreground">{value[0]}</span>}
+        </div>
+        <Slider
+          id={component.id}
+          value={value}
+          onValueChange={handleValueChange}
+          min={min}
+          max={max}
+          step={step}
+          disabled={disabled}
+        />
       </div>
     )
   }
