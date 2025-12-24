@@ -10,6 +10,6 @@ export type { A2UIRendererProps } from './A2UIRenderer.js'
 export { ComponentRenderer } from './ComponentRenderer.js'
 export type { ComponentRendererProps } from './ComponentRenderer.js'
 
-// Component mapper (to be implemented)
-// export { ComponentMapper } from './ComponentMapper.js'
-// export type { ComponentMapperProps } from './ComponentMapper.js'
+// Component mapper
+export { ComponentMapper } from './ComponentMapper.js'
+export type { ComponentMapperProps } from './ComponentMapper.js'
