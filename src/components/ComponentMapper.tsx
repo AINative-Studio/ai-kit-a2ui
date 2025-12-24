@@ -11,6 +11,7 @@ import { Label } from './ui/label'
 import { Checkbox } from './ui/checkbox'
 import { Slider } from './ui/slider'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from './ui/tabs'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select'
 
 export interface ComponentMapperProps {
   /** The A2UI component to render */
@@ -146,6 +147,57 @@ export const ComponentMapper = memo(function ComponentMapper({
     )
   }
 
+  // ChoicePicker component (Select dropdown)
+  if (component.type === 'choicepicker') {
+    const label = String(resolveValue(component.properties?.['label']) || '')
+    const placeholder = String(component.properties?.['placeholder'] || 'Select...')
+    const initialValue = String(resolveValue(component.properties?.['value']) || '')
+    const disabled = Boolean(component.properties?.['disabled'])
+    const required = Boolean(component.properties?.['required'])
+    const action = component.properties?.['action']
+
+    const optionsValue = component.properties?.['options']
+    const options = (
+      Array.isArray(optionsValue) ? optionsValue : resolveValue(optionsValue)
+    ) as Array<{ value: string; label: string }> | undefined
+
+    const [value, setValue] = useState(initialValue)
+
+    const handleValueChange = (newValue: string) => {
+      setValue(newValue)
+
+      if (action) {
+        onAction(String(action), {
+          componentId: component.id,
+          value: newValue,
+        })
+      }
+    }
+
+    return (
+      <div className="a2ui-choicepicker space-y-2">
+        <Label htmlFor={component.id}>{label}</Label>
+        <Select
+          value={value}
+          onValueChange={handleValueChange}
+          disabled={disabled}
+          required={required}
+        >
+          <SelectTrigger id={component.id}>
+            <SelectValue placeholder={placeholder} />
+          </SelectTrigger>
+          <SelectContent>
+            {options?.map((option) => (
+              <SelectItem key={option.value} value={option.value}>
+                {option.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+    )
+  }
+
   // List component
   if (component.type === 'list') {
     const itemsValue = component.properties?.['items']
@@ -227,7 +279,7 @@ export const ComponentMapper = memo(function ComponentMapper({
     if (tabs && tabs.length > 0) {
       return (
         <Tabs
-          defaultValue={defaultValue || tabs[0].value}
+          defaultValue={defaultValue || tabs[0]?.value || ''}
           onValueChange={handleValueChange}
           className="a2ui-tabs"
         >
@@ -249,8 +301,12 @@ export const ComponentMapper = memo(function ComponentMapper({
 
     // Children mode: tabs defined as child components
     if (component.children && component.children.length > 0) {
-      const triggers = component.children.filter((c) => c.type === 'tab-trigger')
-      const contents = component.children.filter((c) => c.type === 'tab-content')
+      const triggers = component.children.filter((c): c is A2UIComponent =>
+        typeof c === 'object' && c.type === 'tab-trigger'
+      )
+      const contents = component.children.filter((c): c is A2UIComponent =>
+        typeof c === 'object' && c.type === 'tab-content'
+      )
 
       return (
         <Tabs
