@@ -10,6 +10,7 @@ import { Input } from './ui/input'
 import { Label } from './ui/label'
 import { Checkbox } from './ui/checkbox'
 import { Slider } from './ui/slider'
+import { Tabs, TabsList, TabsTrigger, TabsContent } from './ui/tabs'
 
 export interface ComponentMapperProps {
   /** The A2UI component to render */
@@ -143,6 +144,93 @@ export const ComponentMapper = memo(function ComponentMapper({
         <Label htmlFor={component.id}>{label}</Label>
       </div>
     )
+  }
+
+  // Tabs component
+  if (component.type === 'tabs') {
+    const defaultValue = String(
+      resolveValue(component.properties?.['defaultValue']) || ''
+    )
+    const action = component.properties?.['action']
+    const tabs = component.properties?.['tabs'] as
+      | Array<{ value: string; label: string; content?: string }>
+      | undefined
+
+    const handleValueChange = (newValue: string) => {
+      if (action) {
+        onAction(String(action), {
+          componentId: component.id,
+          value: newValue,
+        })
+      }
+    }
+
+    // Simple mode: tabs defined in properties
+    if (tabs && tabs.length > 0) {
+      return (
+        <Tabs
+          defaultValue={defaultValue || tabs[0].value}
+          onValueChange={handleValueChange}
+          className="a2ui-tabs"
+        >
+          <TabsList>
+            {tabs.map((tab) => (
+              <TabsTrigger key={tab.value} value={tab.value}>
+                {tab.label}
+              </TabsTrigger>
+            ))}
+          </TabsList>
+          {tabs.map((tab) => (
+            <TabsContent key={tab.value} value={tab.value}>
+              {tab.content || ''}
+            </TabsContent>
+          ))}
+        </Tabs>
+      )
+    }
+
+    // Children mode: tabs defined as child components
+    if (component.children && component.children.length > 0) {
+      const triggers = component.children.filter((c) => c.type === 'tab-trigger')
+      const contents = component.children.filter((c) => c.type === 'tab-content')
+
+      return (
+        <Tabs
+          defaultValue={defaultValue}
+          onValueChange={handleValueChange}
+          className="a2ui-tabs"
+        >
+          <TabsList>
+            {triggers.map((trigger) => (
+              <TabsTrigger
+                key={trigger.id}
+                value={String(trigger.properties?.['value'] || '')}
+              >
+                {String(trigger.properties?.['label'] || '')}
+              </TabsTrigger>
+            ))}
+          </TabsList>
+          {contents.map((content) => (
+            <TabsContent
+              key={content.id}
+              value={String(content.properties?.['value'] || '')}
+            >
+              {content.children &&
+                content.children.map((child) => (
+                  <ComponentMapper
+                    key={child.id}
+                    component={child}
+                    dataModel={dataModel}
+                    onAction={onAction}
+                  />
+                ))}
+            </TabsContent>
+          ))}
+        </Tabs>
+      )
+    }
+
+    return <div className="a2ui-tabs">[Empty tabs]</div>
   }
 
   // Slider component
