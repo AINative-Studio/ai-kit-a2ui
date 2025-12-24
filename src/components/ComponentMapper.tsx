@@ -8,6 +8,7 @@ import type { A2UIComponent } from '@ainative/ai-kit-a2ui-core/types'
 import { JSONPointer } from '@ainative/ai-kit-a2ui-core/json-pointer'
 import { Input } from './ui/input'
 import { Label } from './ui/label'
+import { Checkbox } from './ui/checkbox'
 
 export interface ComponentMapperProps {
   /** The A2UI component to render */
@@ -106,6 +107,41 @@ export const ComponentMapper = memo(function ComponentMapper({
   // Divider component
   if (component.type === 'divider') {
     return <hr role="separator" />
+  }
+
+  // CheckBox component
+  if (component.type === 'checkbox') {
+    const label = String(resolveValue(component.properties?.['label']) || '')
+    const initialChecked = Boolean(resolveValue(component.properties?.['checked']))
+    const disabled = Boolean(component.properties?.['disabled'])
+    const required = Boolean(component.properties?.['required'])
+    const action = component.properties?.['action']
+
+    const [checked, setChecked] = useState(initialChecked)
+
+    const handleCheckedChange = (newChecked: boolean) => {
+      setChecked(newChecked)
+
+      if (action) {
+        onAction(String(action), {
+          componentId: component.id,
+          checked: newChecked,
+        })
+      }
+    }
+
+    return (
+      <div className="a2ui-checkbox flex items-center space-x-2">
+        <Checkbox
+          id={component.id}
+          checked={checked}
+          onCheckedChange={handleCheckedChange}
+          disabled={disabled}
+          required={required}
+        />
+        <Label htmlFor={component.id}>{label}</Label>
+      </div>
+    )
   }
 
   // TextField component (Input + Label)
