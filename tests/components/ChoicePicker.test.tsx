@@ -25,7 +25,7 @@ describe('ChoicePicker Component Adapter', () => {
         },
       }
 
-      render(<ComponentMapper component={component} dataModel={{}} onAction={vi.fn()} />)
+      render(<ComponentMapper component={component} componentsById={{}} dataModel={{}} onAction={vi.fn()} />)
 
       expect(screen.getByText('Country')).toBeInTheDocument()
       expect(screen.getByRole('combobox')).toBeInTheDocument()
@@ -42,7 +42,7 @@ describe('ChoicePicker Component Adapter', () => {
         },
       }
 
-      render(<ComponentMapper component={component} dataModel={{}} onAction={vi.fn()} />)
+      render(<ComponentMapper component={component} componentsById={{}} dataModel={{}} onAction={vi.fn()} />)
 
       expect(screen.getByText('Select an option')).toBeInTheDocument()
     })
@@ -61,7 +61,7 @@ describe('ChoicePicker Component Adapter', () => {
         },
       }
 
-      render(<ComponentMapper component={component} dataModel={{}} onAction={vi.fn()} />)
+      render(<ComponentMapper component={component} componentsById={{}} dataModel={{}} onAction={vi.fn()} />)
 
       expect(screen.getByText('Active')).toBeInTheDocument()
     })
@@ -87,7 +87,7 @@ describe('ChoicePicker Component Adapter', () => {
         },
       }
 
-      render(<ComponentMapper component={component} dataModel={{}} onAction={onAction} />)
+      render(<ComponentMapper component={component} componentsById={{}} dataModel={{}} onAction={onAction} />)
 
       const trigger = screen.getByRole('combobox')
       await userEvent.click(trigger)
@@ -121,7 +121,7 @@ describe('ChoicePicker Component Adapter', () => {
         settings: { theme: 'dark' },
       }
 
-      render(<ComponentMapper component={component} dataModel={dataModel} onAction={vi.fn()} />)
+      render(<ComponentMapper component={component} componentsById={{}} dataModel={dataModel} onAction={vi.fn()} />)
 
       expect(screen.getByText('Dark')).toBeInTheDocument()
     })
@@ -143,7 +143,7 @@ describe('ChoicePicker Component Adapter', () => {
         ],
       }
 
-      render(<ComponentMapper component={component} dataModel={dataModel} onAction={vi.fn()} />)
+      render(<ComponentMapper component={component} componentsById={{}} dataModel={dataModel} onAction={vi.fn()} />)
 
       const trigger = screen.getByRole('combobox')
       expect(trigger).toBeInTheDocument()
@@ -162,7 +162,7 @@ describe('ChoicePicker Component Adapter', () => {
         },
       }
 
-      render(<ComponentMapper component={component} dataModel={{}} onAction={vi.fn()} />)
+      render(<ComponentMapper component={component} componentsById={{}} dataModel={{}} onAction={vi.fn()} />)
 
       expect(screen.getByRole('combobox')).toBeDisabled()
     })
@@ -178,7 +178,7 @@ describe('ChoicePicker Component Adapter', () => {
         },
       }
 
-      render(<ComponentMapper component={component} dataModel={{}} onAction={vi.fn()} />)
+      render(<ComponentMapper component={component} componentsById={{}} dataModel={{}} onAction={vi.fn()} />)
 
       expect(screen.getByRole('combobox')).toBeRequired()
     })

@@ -12,10 +12,25 @@ import { Checkbox } from './ui/checkbox'
 import { Slider } from './ui/slider'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from './ui/tabs'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from './ui/dialog'
+import { Popover, PopoverContent, PopoverTrigger } from './ui/popover'
+import { Calendar } from './ui/calendar'
+import { Button } from './ui/button'
+import { format, parseISO } from 'date-fns'
+import { Avatar, AvatarImage, AvatarFallback } from './ui/avatar'
+import { AspectRatio } from './ui/aspect-ratio'
+import { resolveIcon } from '../lib/icon-map'
 
 export interface ComponentMapperProps {
   /** The A2UI component to render */
   component: A2UIComponent
+  /**
+   * All components in the current surface, keyed by id. A2UI's protocol
+   * represents the component tree as a flat list with id-based references
+   * (`component.children: string[]`), not nested objects — this lookup is
+   * how a component resolves its children's real definitions.
+   */
+  componentsById: Record<string, A2UIComponent>
   /** The current data model for data binding */
   dataModel: Record<string, unknown>
   /** Callback when user performs an action */
@@ -29,8 +44,12 @@ export interface ComponentMapperProps {
  *
  * @example
  * ```tsx
+ * const components = {
+ *   'root-1': { id: 'root-1', type: 'text', properties: { value: '/user/name' } },
+ * }
  * <ComponentMapper
- *   component={{ type: 'text', properties: { value: '/user/name' } }}
+ *   component={components['root-1']}
+ *   componentsById={components}
  *   dataModel={{ user: { name: 'John' } }}
  *   onAction={(action, ctx) => console.log(action)}
  * />
@@ -38,6 +57,7 @@ export interface ComponentMapperProps {
  */
 export const ComponentMapper = memo(function ComponentMapper({
   component,
+  componentsById,
   dataModel,
   onAction,
 }: ComponentMapperProps) {
@@ -59,17 +79,34 @@ export const ComponentMapper = memo(function ComponentMapper({
   }
 
   /**
+   * Resolves this component's children ids to their real component
+   * definitions. Unknown ids (not present in componentsById) are skipped
+   * rather than crashing the render.
+   */
+  const resolveChildren = (): A2UIComponent[] => {
+    if (!component.children || component.children.length === 0) {
+      return []
+    }
+
+    return component.children
+      .map((childId) => componentsById[childId])
+      .filter((child): child is A2UIComponent => child !== undefined)
+  }
+
+  /**
    * Renders children recursively
    */
   const renderChildren = () => {
-    if (!component.children || component.children.length === 0) {
+    const children = resolveChildren()
+    if (children.length === 0) {
       return null
     }
 
-    return component.children.map((child) => (
+    return children.map((child) => (
       <ComponentMapper
         key={child.id}
         component={child}
+        componentsById={componentsById}
         dataModel={dataModel}
         onAction={onAction}
       />
@@ -301,12 +338,9 @@ export const ComponentMapper = memo(function ComponentMapper({
 
     // Children mode: tabs defined as child components
     if (component.children && component.children.length > 0) {
-      const triggers = component.children.filter((c): c is A2UIComponent =>
-        typeof c === 'object' && c.type === 'tab-trigger'
-      )
-      const contents = component.children.filter((c): c is A2UIComponent =>
-        typeof c === 'object' && c.type === 'tab-content'
-      )
+      const tabChildren = resolveChildren()
+      const triggers = tabChildren.filter((c) => c.type === 'tab-trigger')
+      const contents = tabChildren.filter((c) => c.type === 'tab-content')
 
       return (
         <Tabs
@@ -324,22 +358,29 @@ export const ComponentMapper = memo(function ComponentMapper({
               </TabsTrigger>
             ))}
           </TabsList>
-          {contents.map((content) => (
-            <TabsContent
-              key={content.id}
-              value={String(content.properties?.['value'] || '')}
-            >
-              {content.children &&
-                content.children.map((child) => (
+          {contents.map((content) => {
+            const contentChildIds = content.children || []
+            const contentChildren = contentChildIds
+              .map((id) => componentsById[id])
+              .filter((c): c is A2UIComponent => c !== undefined)
+
+            return (
+              <TabsContent
+                key={content.id}
+                value={String(content.properties?.['value'] || '')}
+              >
+                {contentChildren.map((child) => (
                   <ComponentMapper
                     key={child.id}
                     component={child}
+                    componentsById={componentsById}
                     dataModel={dataModel}
                     onAction={onAction}
                   />
                 ))}
-            </TabsContent>
-          ))}
+              </TabsContent>
+            )
+          })}
         </Tabs>
       )
     }
@@ -437,6 +478,180 @@ export const ComponentMapper = memo(function ComponentMapper({
           onBlur={handleBlur}
         />
       </div>
+    )
+  }
+
+  // Modal component (Dialog)
+  if (component.type === 'modal') {
+    const initialOpen = Boolean(resolveValue(component.properties?.['open']))
+    const action = component.properties?.['action']
+
+    const [open, setOpen] = useState(initialOpen)
+
+    const handleOpenChange = (newOpen: boolean) => {
+      setOpen(newOpen)
+
+      if (action) {
+        onAction(String(action), {
+          componentId: component.id,
+          open: newOpen,
+        })
+      }
+    }
+
+    const children = resolveChildren()
+    const titleIndex = children.findIndex((child) => child.type === 'text')
+    const titleChild = titleIndex >= 0 ? children[titleIndex] : undefined
+    const titleValue = titleChild
+      ? String(resolveValue(titleChild.properties?.['value']) || '')
+      : undefined
+    const bodyChildren = titleIndex >= 0 ? children.filter((_, i) => i !== titleIndex) : children
+
+    return (
+      <Dialog open={open} onOpenChange={handleOpenChange}>
+        <DialogContent>
+          {titleValue !== undefined && (
+            <DialogHeader>
+              <DialogTitle>{titleValue}</DialogTitle>
+            </DialogHeader>
+          )}
+          {bodyChildren.map((child) => (
+            <ComponentMapper
+              key={child.id}
+              component={child}
+              componentsById={componentsById}
+              dataModel={dataModel}
+              onAction={onAction}
+            />
+          ))}
+        </DialogContent>
+      </Dialog>
+    )
+  }
+
+  // DateTimeInput component (Popover + Calendar)
+  if (component.type === 'dateTimeInput') {
+    const label = String(resolveValue(component.properties?.['label']) || '')
+    const placeholder = String(component.properties?.['placeholder'] || 'Pick a date')
+    const initialValueRaw = resolveValue(component.properties?.['value'])
+    const initialValue =
+      typeof initialValueRaw === 'string' && initialValueRaw ? parseISO(initialValueRaw) : undefined
+    const disabled = Boolean(component.properties?.['disabled'])
+    const action = component.properties?.['action']
+
+    const [date, setDate] = useState<Date | undefined>(initialValue)
+    const [popoverOpen, setPopoverOpen] = useState(false)
+
+    const handleSelect = (newDate: Date | undefined) => {
+      setDate(newDate)
+      setPopoverOpen(false)
+
+      if (action && newDate) {
+        onAction(String(action), {
+          componentId: component.id,
+          value: newDate.toISOString(),
+        })
+      }
+    }
+
+    return (
+      <div className="a2ui-datetimeinput">
+        <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
+          <PopoverTrigger asChild>
+            <Button
+              id={component.id}
+              variant="outline"
+              disabled={disabled}
+              aria-label={label}
+            >
+              {date ? format(date, 'MMMM do, yyyy') : placeholder}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-0">
+            <Calendar
+              mode="single"
+              selected={date}
+              defaultMonth={date}
+              onSelect={handleSelect}
+              initialFocus
+            />
+          </PopoverContent>
+        </Popover>
+      </div>
+    )
+  }
+
+  // Image component
+  if (component.type === 'image') {
+    const src = String(resolveValue(component.properties?.['src']) || '')
+    const alt = String(resolveValue(component.properties?.['alt']) || '')
+    const circular = Boolean(component.properties?.['circular'])
+
+    if (circular) {
+      return (
+        <Avatar>
+          <AvatarImage src={src} alt={alt} />
+          <AvatarFallback>{alt.slice(0, 2).toUpperCase()}</AvatarFallback>
+        </Avatar>
+      )
+    }
+
+    return <img src={src} alt={alt} className="a2ui-image" />
+  }
+
+  // Video component
+  if (component.type === 'video') {
+    const src = String(resolveValue(component.properties?.['src']) || '')
+    const poster = component.properties?.['poster']
+      ? String(resolveValue(component.properties['poster']))
+      : undefined
+    const ratio = Number(component.properties?.['aspectRatio'] || 16 / 9)
+
+    return (
+      <AspectRatio ratio={ratio} className="a2ui-video">
+        <video src={src} poster={poster} controls className="h-full w-full rounded-md" />
+      </AspectRatio>
+    )
+  }
+
+  // AudioPlayer component
+  if (component.type === 'audioPlayer') {
+    const src = String(resolveValue(component.properties?.['src']) || '')
+    const title = component.properties?.['title']
+      ? String(resolveValue(component.properties['title']))
+      : undefined
+
+    return (
+      <div className="a2ui-audioplayer space-y-1">
+        {title && <p className="text-sm font-medium">{title}</p>}
+        <audio src={src} controls className="w-full" />
+      </div>
+    )
+  }
+
+  // Icon component
+  if (component.type === 'icon') {
+    const name = String(component.properties?.['name'] || '')
+    const action = component.properties?.['action']
+    const IconComp = resolveIcon(name)
+
+    if (action) {
+      return (
+        <button
+          type="button"
+          className="a2ui-icon inline-flex items-center justify-center"
+          onClick={() => onAction(String(action), { componentId: component.id })}
+          aria-label={name}
+        >
+          <IconComp />
+        </button>
+      )
+    }
+
+    return (
+      <span className="a2ui-icon inline-flex items-center justify-center" aria-hidden="true">
+        <IconComp />
+      </span>
     )
   }
 

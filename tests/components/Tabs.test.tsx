@@ -24,7 +24,7 @@ describe('Tabs Component Adapter', () => {
         },
       }
 
-      render(<ComponentMapper component={component} dataModel={{}} onAction={vi.fn()} />)
+      render(<ComponentMapper component={component} componentsById={{}} dataModel={{}} onAction={vi.fn()} />)
 
       expect(screen.getByRole('tab', { name: 'Profile' })).toBeInTheDocument()
       expect(screen.getByRole('tab', { name: 'Settings' })).toBeInTheDocument()
@@ -43,7 +43,7 @@ describe('Tabs Component Adapter', () => {
         },
       }
 
-      render(<ComponentMapper component={component} dataModel={{}} onAction={vi.fn()} />)
+      render(<ComponentMapper component={component} componentsById={{}} dataModel={{}} onAction={vi.fn()} />)
 
       expect(screen.getByText('First tab content')).toBeInTheDocument()
       expect(screen.queryByText('Second tab content')).not.toBeInTheDocument()
@@ -62,7 +62,7 @@ describe('Tabs Component Adapter', () => {
         },
       }
 
-      render(<ComponentMapper component={component} dataModel={{}} onAction={vi.fn()} />)
+      render(<ComponentMapper component={component} componentsById={{}} dataModel={{}} onAction={vi.fn()} />)
 
       const secondTab = screen.getByRole('tab', { name: 'Second' })
       expect(secondTab).toHaveAttribute('data-state', 'active')
@@ -83,7 +83,7 @@ describe('Tabs Component Adapter', () => {
         },
       }
 
-      render(<ComponentMapper component={component} dataModel={{}} onAction={vi.fn()} />)
+      render(<ComponentMapper component={component} componentsById={{}} dataModel={{}} onAction={vi.fn()} />)
 
       expect(screen.getByText('First content')).toBeInTheDocument()
 
@@ -109,7 +109,7 @@ describe('Tabs Component Adapter', () => {
         },
       }
 
-      render(<ComponentMapper component={component} dataModel={{}} onAction={onAction} />)
+      render(<ComponentMapper component={component} componentsById={{}} dataModel={{}} onAction={onAction} />)
 
       const secondTab = screen.getByRole('tab', { name: 'Second' })
       await userEvent.click(secondTab)
@@ -123,51 +123,60 @@ describe('Tabs Component Adapter', () => {
 
   describe('Tabs with Children Components', () => {
     it('renders child components in tab content', () => {
+      const tab1Trigger: A2UIComponent = {
+        id: 'tab1-trigger',
+        type: 'tab-trigger',
+        properties: { value: 'tab1', label: 'Profile' },
+      }
+      const tab1Text: A2UIComponent = {
+        id: 'text-1',
+        type: 'text',
+        properties: { value: 'Profile information' },
+      }
+      const tab1Content: A2UIComponent = {
+        id: 'tab1-content',
+        type: 'tab-content',
+        properties: { value: 'tab1' },
+        children: ['text-1'],
+      }
+      const tab2Trigger: A2UIComponent = {
+        id: 'tab2-trigger',
+        type: 'tab-trigger',
+        properties: { value: 'tab2', label: 'Settings' },
+      }
+      const tab2Text: A2UIComponent = {
+        id: 'text-2',
+        type: 'text',
+        properties: { value: 'Settings panel' },
+      }
+      const tab2Content: A2UIComponent = {
+        id: 'tab2-content',
+        type: 'tab-content',
+        properties: { value: 'tab2' },
+        children: ['text-2'],
+      }
       const component: A2UIComponent = {
         id: 'tabs-1',
         type: 'tabs',
         properties: {
           defaultValue: 'tab1',
         },
-        children: [
-          {
-            id: 'tab1-trigger',
-            type: 'tab-trigger',
-            properties: { value: 'tab1', label: 'Profile' },
-          },
-          {
-            id: 'tab1-content',
-            type: 'tab-content',
-            properties: { value: 'tab1' },
-            children: [
-              {
-                id: 'text-1',
-                type: 'text',
-                properties: { value: 'Profile information' },
-              },
-            ],
-          },
-          {
-            id: 'tab2-trigger',
-            type: 'tab-trigger',
-            properties: { value: 'tab2', label: 'Settings' },
-          },
-          {
-            id: 'tab2-content',
-            type: 'tab-content',
-            properties: { value: 'tab2' },
-            children: [
-              {
-                id: 'text-2',
-                type: 'text',
-                properties: { value: 'Settings panel' },
-              },
-            ],
-          },
-        ],
+        children: ['tab1-trigger', 'tab1-content', 'tab2-trigger', 'tab2-content'],
       }
+      const componentsById = Object.fromEntries(
+        [component, tab1Trigger, tab1Content, tab1Text, tab2Trigger, tab2Content, tab2Text].map(
+          (c) => [c.id, c]
+        )
+      )
 
-      render(<ComponentMapper component={component} dataModel={{}} onAction={vi.fn()} />)
+      render(
+        <ComponentMapper
+          component={component}
+          componentsById={componentsById}
+          dataModel={{}}
+          onAction={vi.fn()}
+        />
+      )
 
       expect(screen.getByRole('tab', { name: 'Profile' })).toBeInTheDocument()
       expect(screen.getByText('Profile information')).toBeInTheDocument()
@@ -192,7 +201,7 @@ describe('Tabs Component Adapter', () => {
         ui: { activeTab: 'tab2' },
       }
 
-      render(<ComponentMapper component={component} dataModel={dataModel} onAction={vi.fn()} />)
+      render(<ComponentMapper component={component} componentsById={{}} dataModel={dataModel} onAction={vi.fn()} />)
 
       expect(screen.getByText('Second content')).toBeInTheDocument()
     })

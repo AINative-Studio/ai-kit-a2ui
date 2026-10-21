@@ -14,7 +14,7 @@
 import { useEffect, useState, useCallback, useMemo } from 'react'
 import type { A2UIComponent, A2UIMessage } from '@ainative/ai-kit-a2ui-core/types'
 import { A2UITransport } from '@ainative/ai-kit-a2ui-core/transport'
-import { ComponentRenderer } from './ComponentRenderer'
+import { ComponentMapper } from './ComponentMapper'
 
 export interface A2UIRendererProps {
   /** WebSocket URL for agent connection */
@@ -139,6 +139,20 @@ export function A2UIRenderer({
     return error?.message || 'Connection failed'
   }, [error])
 
+  // Flat id -> component lookup, as the A2UI protocol represents a surface
+  // (component.children holds ids, not nested objects).
+  const componentsById = useMemo(
+    () => Object.fromEntries(components.map((c) => [c.id, c])),
+    [components]
+  )
+
+  // Only render components that aren't referenced as someone else's child,
+  // so a child isn't rendered once at the root and again inside its parent.
+  const rootComponents = useMemo(() => {
+    const childIds = new Set(components.flatMap((c) => c.children || []))
+    return components.filter((c) => !childIds.has(c.id))
+  }, [components])
+
   // Render states
   if (state === 'connecting') {
     return (
@@ -167,10 +181,11 @@ export function A2UIRenderer({
   // Render components
   return (
     <div className="a2ui-renderer" role="main">
-      {components.map((component) => (
-        <ComponentRenderer
+      {rootComponents.map((component) => (
+        <ComponentMapper
           key={component.id}
           component={component}
+          componentsById={componentsById}
           dataModel={dataModel}
           onAction={handleAction}
         />
