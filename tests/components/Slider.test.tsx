@@ -23,7 +23,7 @@ describe('Slider Component Adapter', () => {
         },
       }
 
-      render(<ComponentMapper component={component} dataModel={{}} onAction={vi.fn()} />)
+      render(<ComponentMapper component={component} componentsById={{}} dataModel={{}} onAction={vi.fn()} />)
 
       expect(screen.getByText('Volume')).toBeInTheDocument()
       expect(screen.getByRole('slider')).toBeInTheDocument()
@@ -41,7 +41,7 @@ describe('Slider Component Adapter', () => {
         },
       }
 
-      render(<ComponentMapper component={component} dataModel={{}} onAction={vi.fn()} />)
+      render(<ComponentMapper component={component} componentsById={{}} dataModel={{}} onAction={vi.fn()} />)
 
       const slider = screen.getByRole('slider')
       expect(slider).toHaveAttribute('aria-valuenow', '75')
@@ -59,7 +59,7 @@ describe('Slider Component Adapter', () => {
         },
       }
 
-      render(<ComponentMapper component={component} dataModel={{}} onAction={vi.fn()} />)
+      render(<ComponentMapper component={component} componentsById={{}} dataModel={{}} onAction={vi.fn()} />)
 
       const slider = screen.getByRole('slider')
       expect(slider).toHaveAttribute('aria-valuemin', '-10')
@@ -79,7 +79,7 @@ describe('Slider Component Adapter', () => {
         },
       }
 
-      render(<ComponentMapper component={component} dataModel={{}} onAction={vi.fn()} />)
+      render(<ComponentMapper component={component} componentsById={{}} dataModel={{}} onAction={vi.fn()} />)
 
       const slider = screen.getByRole('slider')
       expect(slider).toBeInTheDocument()
@@ -101,7 +101,7 @@ describe('Slider Component Adapter', () => {
         },
       }
 
-      render(<ComponentMapper component={component} dataModel={{}} onAction={onAction} />)
+      render(<ComponentMapper component={component} componentsById={{}} dataModel={{}} onAction={onAction} />)
 
       const slider = screen.getByRole('slider')
 
@@ -130,7 +130,7 @@ describe('Slider Component Adapter', () => {
         settings: { volume: 80 },
       }
 
-      render(<ComponentMapper component={component} dataModel={dataModel} onAction={vi.fn()} />)
+      render(<ComponentMapper component={component} componentsById={{}} dataModel={dataModel} onAction={vi.fn()} />)
 
       const slider = screen.getByRole('slider')
       expect(slider).toHaveAttribute('aria-valuenow', '80')
@@ -151,7 +151,7 @@ describe('Slider Component Adapter', () => {
         },
       }
 
-      render(<ComponentMapper component={component} dataModel={{}} onAction={vi.fn()} />)
+      render(<ComponentMapper component={component} componentsById={{}} dataModel={{}} onAction={vi.fn()} />)
 
       const slider = screen.getByRole('slider')
       expect(slider).toHaveAttribute('data-disabled')
@@ -172,7 +172,7 @@ describe('Slider Component Adapter', () => {
         },
       }
 
-      render(<ComponentMapper component={component} dataModel={{}} onAction={vi.fn()} />)
+      render(<ComponentMapper component={component} componentsById={{}} dataModel={{}} onAction={vi.fn()} />)
 
       expect(screen.getByText('65')).toBeInTheDocument()
     })

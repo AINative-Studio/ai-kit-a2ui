@@ -21,7 +21,7 @@ describe('CheckBox Component Adapter', () => {
         },
       }
 
-      render(<ComponentMapper component={component} dataModel={{}} onAction={vi.fn()} />)
+      render(<ComponentMapper component={component} componentsById={{}} dataModel={{}} onAction={vi.fn()} />)
 
       expect(screen.getByLabelText('Accept Terms')).toBeInTheDocument()
       expect(screen.getByRole('checkbox')).toBeInTheDocument()
@@ -37,7 +37,7 @@ describe('CheckBox Component Adapter', () => {
         },
       }
 
-      render(<ComponentMapper component={component} dataModel={{}} onAction={vi.fn()} />)
+      render(<ComponentMapper component={component} componentsById={{}} dataModel={{}} onAction={vi.fn()} />)
 
       const checkbox = screen.getByRole('checkbox') as HTMLInputElement
       expect(checkbox).toBeChecked()
@@ -53,7 +53,7 @@ describe('CheckBox Component Adapter', () => {
         },
       }
 
-      render(<ComponentMapper component={component} dataModel={{}} onAction={vi.fn()} />)
+      render(<ComponentMapper component={component} componentsById={{}} dataModel={{}} onAction={vi.fn()} />)
 
       const checkbox = screen.getByRole('checkbox') as HTMLInputElement
       expect(checkbox).not.toBeChecked()
@@ -73,7 +73,7 @@ describe('CheckBox Component Adapter', () => {
         },
       }
 
-      render(<ComponentMapper component={component} dataModel={{}} onAction={onAction} />)
+      render(<ComponentMapper component={component} componentsById={{}} dataModel={{}} onAction={onAction} />)
 
       const checkbox = screen.getByRole('checkbox')
       await userEvent.click(checkbox)
@@ -94,7 +94,7 @@ describe('CheckBox Component Adapter', () => {
         },
       }
 
-      render(<ComponentMapper component={component} dataModel={{}} onAction={vi.fn()} />)
+      render(<ComponentMapper component={component} componentsById={{}} dataModel={{}} onAction={vi.fn()} />)
 
       const checkbox = screen.getByRole('checkbox') as HTMLInputElement
 
@@ -123,7 +123,7 @@ describe('CheckBox Component Adapter', () => {
         settings: { notifications: true },
       }
 
-      render(<ComponentMapper component={component} dataModel={dataModel} onAction={vi.fn()} />)
+      render(<ComponentMapper component={component} componentsById={{}} dataModel={dataModel} onAction={vi.fn()} />)
 
       const checkbox = screen.getByRole('checkbox') as HTMLInputElement
       expect(checkbox).toBeChecked()
@@ -141,7 +141,7 @@ describe('CheckBox Component Adapter', () => {
         },
       }
 
-      render(<ComponentMapper component={component} dataModel={{}} onAction={vi.fn()} />)
+      render(<ComponentMapper component={component} componentsById={{}} dataModel={{}} onAction={vi.fn()} />)
 
       expect(screen.getByRole('checkbox')).toBeDisabled()
     })
@@ -156,7 +156,7 @@ describe('CheckBox Component Adapter', () => {
         },
       }
 
-      render(<ComponentMapper component={component} dataModel={{}} onAction={vi.fn()} />)
+      render(<ComponentMapper component={component} componentsById={{}} dataModel={{}} onAction={vi.fn()} />)
 
       expect(screen.getByRole('checkbox')).toBeRequired()
     })

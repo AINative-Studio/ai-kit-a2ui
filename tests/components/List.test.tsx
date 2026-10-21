@@ -24,7 +24,7 @@ describe('List Component Adapter', () => {
         },
       }
 
-      render(<ComponentMapper component={component} dataModel={{}} onAction={vi.fn()} />)
+      render(<ComponentMapper component={component} componentsById={{}} dataModel={{}} onAction={vi.fn()} />)
 
       expect(screen.getByText('First Item')).toBeInTheDocument()
       expect(screen.getByText('Second Item')).toBeInTheDocument()
@@ -41,7 +41,7 @@ describe('List Component Adapter', () => {
       }
 
       const { container } = render(
-        <ComponentMapper component={component} dataModel={{}} onAction={vi.fn()} />
+        <ComponentMapper component={component} componentsById={{}} dataModel={{}} onAction={vi.fn()} />
       )
 
       expect(container.querySelector('.a2ui-list')).toBeInTheDocument()
@@ -58,7 +58,7 @@ describe('List Component Adapter', () => {
         },
       }
 
-      render(<ComponentMapper component={component} dataModel={{}} onAction={vi.fn()} />)
+      render(<ComponentMapper component={component} componentsById={{}} dataModel={{}} onAction={vi.fn()} />)
 
       expect(screen.getByText('Title')).toBeInTheDocument()
       expect(screen.getByText('Subtitle text')).toBeInTheDocument()
@@ -79,7 +79,7 @@ describe('List Component Adapter', () => {
         },
       }
 
-      render(<ComponentMapper component={component} dataModel={{}} onAction={onAction} />)
+      render(<ComponentMapper component={component} componentsById={{}} dataModel={{}} onAction={onAction} />)
 
       const item = screen.getByText('Click Me')
       await userEvent.click(item)
@@ -102,7 +102,7 @@ describe('List Component Adapter', () => {
         },
       }
 
-      render(<ComponentMapper component={component} dataModel={{}} onAction={vi.fn()} />)
+      render(<ComponentMapper component={component} componentsById={{}} dataModel={{}} onAction={vi.fn()} />)
 
       const item = screen.getByText('Static Item')
       expect(item.closest('button')).not.toBeInTheDocument()
@@ -126,7 +126,7 @@ describe('List Component Adapter', () => {
         ],
       }
 
-      render(<ComponentMapper component={component} dataModel={dataModel} onAction={vi.fn()} />)
+      render(<ComponentMapper component={component} componentsById={{}} dataModel={dataModel} onAction={vi.fn()} />)
 
       expect(screen.getByText('Alice')).toBeInTheDocument()
       expect(screen.getByText('Bob')).toBeInTheDocument()
@@ -148,7 +148,7 @@ describe('List Component Adapter', () => {
       }
 
       const { container } = render(
-        <ComponentMapper component={component} dataModel={{}} onAction={vi.fn()} />
+        <ComponentMapper component={component} componentsById={{}} dataModel={{}} onAction={vi.fn()} />
       )
 
       // Should have separators between items
@@ -170,7 +170,7 @@ describe('List Component Adapter', () => {
       }
 
       const { container } = render(
-        <ComponentMapper component={component} dataModel={{}} onAction={vi.fn()} />
+        <ComponentMapper component={component} componentsById={{}} dataModel={{}} onAction={vi.fn()} />
       )
 
       expect(container.querySelector('ol')).toBeInTheDocument()
@@ -189,7 +189,7 @@ describe('List Component Adapter', () => {
       }
 
       const { container } = render(
-        <ComponentMapper component={component} dataModel={{}} onAction={vi.fn()} />
+        <ComponentMapper component={component} componentsById={{}} dataModel={{}} onAction={vi.fn()} />
       )
 
       expect(container.querySelector('ul')).toBeInTheDocument()

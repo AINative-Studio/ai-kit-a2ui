@@ -21,7 +21,7 @@ describe('TextField Component Adapter', () => {
         },
       }
 
-      render(<ComponentMapper component={component} dataModel={{}} onAction={vi.fn()} />)
+      render(<ComponentMapper component={component} componentsById={{}} dataModel={{}} onAction={vi.fn()} />)
 
       expect(screen.getByLabelText('Email Address')).toBeInTheDocument()
       expect(screen.getByRole('textbox')).toBeInTheDocument()
@@ -37,7 +37,7 @@ describe('TextField Component Adapter', () => {
         },
       }
 
-      render(<ComponentMapper component={component} dataModel={{}} onAction={vi.fn()} />)
+      render(<ComponentMapper component={component} componentsById={{}} dataModel={{}} onAction={vi.fn()} />)
 
       const input = screen.getByRole('textbox') as HTMLInputElement
       expect(input.value).toBe('john_doe')
@@ -53,7 +53,7 @@ describe('TextField Component Adapter', () => {
         },
       }
 
-      render(<ComponentMapper component={component} dataModel={{}} onAction={vi.fn()} />)
+      render(<ComponentMapper component={component} componentsById={{}} dataModel={{}} onAction={vi.fn()} />)
 
       expect(screen.getByPlaceholderText('Enter search query...')).toBeInTheDocument()
     })
@@ -70,7 +70,7 @@ describe('TextField Component Adapter', () => {
         },
       }
 
-      render(<ComponentMapper component={component} dataModel={{}} onAction={vi.fn()} />)
+      render(<ComponentMapper component={component} componentsById={{}} dataModel={{}} onAction={vi.fn()} />)
 
       const input = screen.getByLabelText('Password')
       expect(input).toHaveAttribute('type', 'password')
@@ -86,7 +86,7 @@ describe('TextField Component Adapter', () => {
         },
       }
 
-      render(<ComponentMapper component={component} dataModel={{}} onAction={vi.fn()} />)
+      render(<ComponentMapper component={component} componentsById={{}} dataModel={{}} onAction={vi.fn()} />)
 
       const input = screen.getByLabelText('Email')
       expect(input).toHaveAttribute('type', 'email')
@@ -102,7 +102,7 @@ describe('TextField Component Adapter', () => {
         },
       }
 
-      render(<ComponentMapper component={component} dataModel={{}} onAction={vi.fn()} />)
+      render(<ComponentMapper component={component} componentsById={{}} dataModel={{}} onAction={vi.fn()} />)
 
       const input = screen.getByLabelText('Age')
       expect(input).toHaveAttribute('type', 'number')
@@ -121,7 +121,7 @@ describe('TextField Component Adapter', () => {
         },
       }
 
-      render(<ComponentMapper component={component} dataModel={{}} onAction={onAction} />)
+      render(<ComponentMapper component={component} componentsById={{}} dataModel={{}} onAction={onAction} />)
 
       const input = screen.getByRole('textbox')
       await userEvent.type(input, 'John')
@@ -143,7 +143,7 @@ describe('TextField Component Adapter', () => {
         },
       }
 
-      render(<ComponentMapper component={component} dataModel={{}} onAction={onAction} />)
+      render(<ComponentMapper component={component} componentsById={{}} dataModel={{}} onAction={onAction} />)
 
       const input = screen.getByRole('textbox')
       await userEvent.click(input)
@@ -168,7 +168,7 @@ describe('TextField Component Adapter', () => {
         user: { username: 'alice' },
       }
 
-      render(<ComponentMapper component={component} dataModel={dataModel} onAction={vi.fn()} />)
+      render(<ComponentMapper component={component} componentsById={{}} dataModel={dataModel} onAction={vi.fn()} />)
 
       const input = screen.getByRole('textbox') as HTMLInputElement
       expect(input.value).toBe('alice')
@@ -186,7 +186,7 @@ describe('TextField Component Adapter', () => {
         },
       }
 
-      render(<ComponentMapper component={component} dataModel={{}} onAction={vi.fn()} />)
+      render(<ComponentMapper component={component} componentsById={{}} dataModel={{}} onAction={vi.fn()} />)
 
       expect(screen.getByRole('textbox')).toBeDisabled()
     })
@@ -201,7 +201,7 @@ describe('TextField Component Adapter', () => {
         },
       }
 
-      render(<ComponentMapper component={component} dataModel={{}} onAction={vi.fn()} />)
+      render(<ComponentMapper component={component} componentsById={{}} dataModel={{}} onAction={vi.fn()} />)
 
       expect(screen.getByRole('textbox')).toBeRequired()
     })

@@ -17,7 +17,7 @@ describe('ComponentMapper', () => {
         properties: { value: 'Hello World' },
       }
 
-      render(<ComponentMapper component={component} dataModel={{}} onAction={vi.fn()} />)
+      render(<ComponentMapper component={component} componentsById={{}} dataModel={{}} onAction={vi.fn()} />)
       expect(screen.getByText('Hello World')).toBeInTheDocument()
     })
 
@@ -28,7 +28,7 @@ describe('ComponentMapper', () => {
         properties: { label: 'Click Me' },
       }
 
-      render(<ComponentMapper component={component} dataModel={{}} onAction={vi.fn()} />)
+      render(<ComponentMapper component={component} componentsById={{}} dataModel={{}} onAction={vi.fn()} />)
       expect(screen.getByRole('button', { name: /click me/i })).toBeInTheDocument()
     })
 
@@ -39,27 +39,34 @@ describe('ComponentMapper', () => {
         properties: { value: 'My Title', level: 1 },
       }
 
-      render(<ComponentMapper component={component} dataModel={{}} onAction={vi.fn()} />)
+      render(<ComponentMapper component={component} componentsById={{}} dataModel={{}} onAction={vi.fn()} />)
       expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('My Title')
     })
   })
 
   describe('Layout Components', () => {
     it('renders container with children', () => {
+      const textChild: A2UIComponent = {
+        id: 'text-1',
+        type: 'text',
+        properties: { value: 'Child Text' },
+      }
       const component: A2UIComponent = {
         id: 'container-1',
         type: 'container',
         properties: {},
-        children: [
-          {
-            id: 'text-1',
-            type: 'text',
-            properties: { value: 'Child Text' },
-          },
-        ],
+        children: ['text-1'],
       }
+      const componentsById = { 'container-1': component, 'text-1': textChild }
 
-      render(<ComponentMapper component={component} dataModel={{}} onAction={vi.fn()} />)
+      render(
+        <ComponentMapper
+          component={component}
+          componentsById={componentsById}
+          dataModel={{}}
+          onAction={vi.fn()}
+        />
+      )
       expect(screen.getByText('Child Text')).toBeInTheDocument()
     })
 
@@ -70,7 +77,7 @@ describe('ComponentMapper', () => {
         properties: {},
       }
 
-      render(<ComponentMapper component={component} dataModel={{}} onAction={vi.fn()} />)
+      render(<ComponentMapper component={component} componentsById={{}} dataModel={{}} onAction={vi.fn()} />)
       expect(screen.getByRole('separator')).toBeInTheDocument()
     })
   })
@@ -87,7 +94,7 @@ describe('ComponentMapper', () => {
         user: { name: 'John Doe' },
       }
 
-      render(<ComponentMapper component={component} dataModel={dataModel} onAction={vi.fn()} />)
+      render(<ComponentMapper component={component} componentsById={{}} dataModel={dataModel} onAction={vi.fn()} />)
       expect(screen.getByText('John Doe')).toBeInTheDocument()
     })
 
@@ -98,7 +105,7 @@ describe('ComponentMapper', () => {
         properties: { value: '/nonexistent/path' },
       }
 
-      render(<ComponentMapper component={component} dataModel={{}} onAction={vi.fn()} />)
+      render(<ComponentMapper component={component} componentsById={{}} dataModel={{}} onAction={vi.fn()} />)
       expect(screen.getByText('/nonexistent/path')).toBeInTheDocument()
     })
   })
@@ -112,7 +119,7 @@ describe('ComponentMapper', () => {
         properties: { label: 'Submit', action: 'submit-form' },
       }
 
-      render(<ComponentMapper component={component} dataModel={{}} onAction={onAction} />)
+      render(<ComponentMapper component={component} componentsById={{}} dataModel={{}} onAction={onAction} />)
 
       const button = screen.getByRole('button')
       button.click()
@@ -131,7 +138,7 @@ describe('ComponentMapper', () => {
         properties: {},
       }
 
-      render(<ComponentMapper component={component} dataModel={{}} onAction={vi.fn()} />)
+      render(<ComponentMapper component={component} componentsById={{}} dataModel={{}} onAction={vi.fn()} />)
       expect(screen.getByText('[unknown-component-type]')).toBeInTheDocument()
     })
   })
@@ -145,7 +152,7 @@ describe('ComponentMapper', () => {
         properties: { value: 'Test' },
       }
 
-      render(<ComponentMapper component={component} dataModel={{}} onAction={vi.fn()} />)
+      render(<ComponentMapper component={component} componentsById={{}} dataModel={{}} onAction={vi.fn()} />)
       expect(screen.getByText('Test')).toBeInTheDocument()
     })
   })
@@ -159,7 +166,7 @@ describe('ComponentMapper', () => {
       }
 
       const { container } = render(
-        <ComponentMapper component={component} dataModel={{}} onAction={vi.fn()} />
+        <ComponentMapper component={component} componentsById={{}} dataModel={{}} onAction={vi.fn()} />
       )
       // Should render without crashing and have a div element
       expect(container.querySelector('div')).toBeInTheDocument()
