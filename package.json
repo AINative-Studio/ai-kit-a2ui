@@ -84,7 +84,7 @@
     "react-dom": "^18.3.0"
   },
   "dependencies": {
-    "@ainative/ai-kit-a2ui-core": "file:../ai-kit-a2ui-core",
+    "@ainative/ai-kit-a2ui-core": "^0.1.0-alpha.1",
     "@radix-ui/react-aspect-ratio": "^1.2.0",
     "@radix-ui/react-avatar": "^1.3.1",
     "@radix-ui/react-checkbox": "^1.0.4",
